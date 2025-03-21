@@ -1,7 +1,7 @@
 {
   "Name": "Galaxy Toolkit",
   "Author": "VTXG",
-  "Description": "[External]",
+  "Description": "An external tool for SMG2 modding that hooks into Dolphin Emulator and provides ways of interacting with it.",
   "InstallDependencies": ["Syati_Init","Syati_CommonFunctionHooks"],
   "CompilerFlags": ["-DTOOLKIT"],
   "ModuleData": [

@@ -1,1 +1,0 @@
-Galaxy Toolkit offers various features to assist with making mods, exploring stages, and everything in between.
