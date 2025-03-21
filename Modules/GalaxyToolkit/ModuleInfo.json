@@ -1,0 +1,18 @@
+{
+  "Name": "Galaxy Toolkit",
+  "Author": "VTXG",
+  "Description": "[External]",
+  "InstallDependencies": ["Syati_Init","Syati_CommonFunctionHooks"],
+  "CompilerFlags": ["-DTOOLKIT"],
+  "ModuleData": [
+    {
+      "OnGameSceneUpdate": [
+        {
+          "Name":"GToolkit",
+          "Function":"GToolkitCore::control",
+          "Include":"Core.h"
+        }
+      ]
+    }
+  ]
+}

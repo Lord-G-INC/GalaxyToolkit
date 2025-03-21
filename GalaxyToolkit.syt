@@ -1,0 +1,9 @@
+{
+  "ModulesPath": "Modules\\",
+  "OutputPath": "Game\\GToolkit\\CustomCode\\",
+  "Regions": [
+    "USA"
+  ],
+  "Unibuild": "Never",
+  "Tasks": []
+}

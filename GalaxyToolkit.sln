@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DolphinMemory", "DolphinMemory\DolphinMemory.csproj", "{936058B8-8773-4884-9016-92B7B44A2F88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalaxyToolkit", "GalaxyToolkit\GalaxyToolkit.csproj", "{5082D91C-EBCD-4990-AB95-32178C1A94F9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{936058B8-8773-4884-9016-92B7B44A2F88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{936058B8-8773-4884-9016-92B7B44A2F88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{936058B8-8773-4884-9016-92B7B44A2F88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{936058B8-8773-4884-9016-92B7B44A2F88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5082D91C-EBCD-4990-AB95-32178C1A94F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5082D91C-EBCD-4990-AB95-32178C1A94F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5082D91C-EBCD-4990-AB95-32178C1A94F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5082D91C-EBCD-4990-AB95-32178C1A94F9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
