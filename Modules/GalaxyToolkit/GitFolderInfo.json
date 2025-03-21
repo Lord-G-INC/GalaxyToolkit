@@ -1,0 +1,7 @@
+{
+  "Version": 1,
+  "Files": [
+    "include/Core.h",
+    "source/Core.cpp"
+  ]
+}
