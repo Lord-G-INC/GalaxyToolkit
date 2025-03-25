@@ -9,7 +9,33 @@ namespace GalaxyToolkit.Commands {
         string Keyword { get; }
         string HelpMessage { get; }
 
-        bool Execute(Toolkit toolkit, string[] args);
+        CommandResult Execute(Toolkit toolkit, string[] args);
+    }
+
+    public class CommandResult {
+        public static readonly CommandResult SilentSucess = new(true, "Command Executed Successfully");
+        public static readonly CommandResult SilentFail = new(false);
+
+        private readonly bool _success;
+        private readonly string _message;
+
+        public bool Success {
+            get => _success;
+        }
+
+        public string Message {
+            get => _message;
+        }
+
+        public CommandResult(bool success) {
+            _success = success;
+            _message = string.Empty;
+        }
+
+        public CommandResult(bool success, string message) {
+            _success = success;
+            _message = message;
+        }
     }
 
     public class CrashCommand : IToolkitCommand {
@@ -19,9 +45,9 @@ namespace GalaxyToolkit.Commands {
               Crashes the game with a null OSReport message.
             """;
 
-        public bool Execute(Toolkit toolkit, string[] args) {
+        public CommandResult Execute(Toolkit toolkit, string[] args) {
             toolkit.ToolMessage.Write(0xFFFFFFFF);
-            return true;
+            return CommandResult.SilentSucess;
         }
     }
 
@@ -37,7 +63,7 @@ namespace GalaxyToolkit.Commands {
               Value: A boolean (true/false).
             """;
 
-        public bool Execute(Toolkit toolkit, string[] args) {
+        public CommandResult Execute(Toolkit toolkit, string[] args) {
             if (args.Length < 2)
                 return this.ExitError();
 
@@ -47,36 +73,7 @@ namespace GalaxyToolkit.Commands {
                 return this.ExitError();
 
             toolkit.ToolMessage.Write(freeze.Value ? TrueCode : FalseCode);
-            return true;
-        }
-    }
-
-    public class HelpCommand : IToolkitCommand {
-        public string Keyword { get; } = "help";
-        public string HelpMessage { get; } = """
-            HelpCommand usage: help [CommandName]
-              Shows the help message for a command.
-
-              CommandName: An optional name of a command.
-            """;
-
-        public bool Execute(Toolkit toolkit, string[] args) {
-            if (args.Length >= 2) {
-                if (CommandManager.Commands.TryGetValue(args[1], out var command)) {
-                    Console.WriteLine(command.HelpMessage);
-                    return true;
-                }
-
-                return this.ExitError($"Command \"{args[1]}\" could not be found.");
-            }
-
-            var keys = CommandManager.Commands.Keys;
-            Console.WriteLine($"Available commands ({keys.Count}):");
-
-            foreach (var keyword in keys)
-                Console.WriteLine($"  - {keyword}");
-
-            return true;
+            return CommandResult.SilentSucess;
         }
     }
 
@@ -91,11 +88,11 @@ namespace GalaxyToolkit.Commands {
               Dump: An optional boolean (true/false). If the log should be dumped to a file.
             """;
 
-        public bool Execute(Toolkit toolkit, string[] args) {
+        public CommandResult Execute(Toolkit toolkit, string[] args) {
             var contextAddress = toolkit.GameMessage.Read<uint>();
 
             if (!Utils.IsValidAddress(contextAddress))
-                return this.ExitError("Game message is not a valid OSContext pointer.");
+                return new(false, "Game message is not a valid OSContext pointer.");
 
             var sb = new StringBuilder();
             var grp = new BufferAddress(toolkit.Dolphin, contextAddress, 32).Read<uint>();
@@ -150,7 +147,6 @@ namespace GalaxyToolkit.Commands {
             WriteSplit(sb);
 
             var str = sb.ToString();
-            Console.WriteLine(str);
 
             if (args.Length > 1 && (Utils.ConvertToBool(args[1]) ?? false)) {
                 Directory.CreateDirectory(DumpDirectoryPath);
@@ -158,10 +154,10 @@ namespace GalaxyToolkit.Commands {
                 var path = Path.Combine(DumpDirectoryPath, $"crash-log-{DateTime.Now:dd-MM-yyyy-HH-mm-ss}.txt");
                 File.WriteAllText(path, str);
 
-                Console.WriteLine($"Dumped crash log to {path}.");
+                sb.AppendLine($"Dumped crash log to {path}.");
             }
             
-            return true;
+            return new(true, sb.ToString());
 
             static void WriteSplit(StringBuilder sb, string? name = null) {
                 sb.Append("------------------------------------------------- ");
@@ -185,8 +181,8 @@ namespace GalaxyToolkit.Commands {
         public string Keyword { get; } = "obj";
         public string HelpMessage { get; } = string.Empty;
 
-        public bool Execute(Toolkit toolkit, string[] args) {
-            return true;
+        public CommandResult Execute(Toolkit toolkit, string[] args) {
+            return CommandResult.SilentSucess;
         }
     }
 
@@ -203,7 +199,7 @@ namespace GalaxyToolkit.Commands {
               StarNo: The star ID.
             """;
 
-        public bool Execute(Toolkit toolkit, string[] args) {
+        public CommandResult Execute(Toolkit toolkit, string[] args) {
             if (args.Length < 4)
                 return this.ExitError();
 
@@ -212,13 +208,13 @@ namespace GalaxyToolkit.Commands {
             if (sbyte.TryParse(args[2], out var scenarioNo)) {
                 if (sbyte.TryParse(args[3], out var starNo)) {
                     toolkit.ToolMessage.Write((uint)((starNo << 16) | (scenarioNo << 8) | Code));
-                    return true;
+                    return CommandResult.SilentSucess;
                 }
 
-                return this.ExitError("Invalid StarNo.");
+                return new(false, "Invalid StarNo.");
             }
 
-            return this.ExitError("Invalid ScenarioID.");
+            return new(false, "Invalid ScenarioID.");
         }
     }
 
@@ -235,7 +231,7 @@ namespace GalaxyToolkit.Commands {
               Value: Either a vector or a general position name.
             """;
 
-        public bool Execute(Toolkit toolkit, string[] args) {
+        public CommandResult Execute(Toolkit toolkit, string[] args) {
             if (args.Length < 3)
                 return this.ExitError();
 
@@ -244,24 +240,24 @@ namespace GalaxyToolkit.Commands {
                     var strValues = args[2].Split(',', 3);
 
                     if (strValues.Length < 3)
-                        return this.ExitError("Invalid value Vector3.");
+                        return new(false, "Invalid value Vector3.");
 
                     for (uint i = 0; i < 3; i++) {
                         if (float.TryParse(strValues[i], out var value))
                             toolkit.DataBuffer.Write(value, i * sizeof(float));
                         else
-                            return this.ExitError($"Unable to parse \"{strValues[i]}\" as a float.");
+                            return new(false, $"Unable to parse \"{strValues[i]}\" as a float.");
                     }
 
                     toolkit.ToolMessage.Write(PosCode);
-                    return true;
+                    return CommandResult.SilentSucess;
                 case "GeneralPos":
                     toolkit.DataBuffer.Write(args[2]);
                     toolkit.ToolMessage.Write(GeneralPosCode);
-                    return true;
+                    return CommandResult.SilentSucess;
             }
 
-            return this.ExitError($"Unknown warp type \"{args[1]}\".");
+            return new(false, $"Unknown warp type \"{args[1]}\".");
         }
     }
 
@@ -276,12 +272,12 @@ namespace GalaxyToolkit.Commands {
               Format: An optional value formatting.
             """;
 
-        public bool Execute(Toolkit toolkit, string[] args) {
+        public CommandResult Execute(Toolkit toolkit, string[] args) {
             if (args.Length < 3)
                 return this.ExitError();
 
             if (!uint.TryParse(Utils.RemoveHexSpecifier(args[2]), System.Globalization.NumberStyles.HexNumber, null, out var address))
-                return this.ExitError($"Unable to parse address \"{args[2]}\".");
+                return new(false, $"Unable to parse address \"{args[2]}\".");
 
             try {
                 var data = new Address(toolkit.Dolphin, address);
@@ -301,11 +297,10 @@ namespace GalaxyToolkit.Commands {
                     _ => throw new Exception($"Unknown data type \"{args[1]}\".")
                 };
 
-                Console.WriteLine(result);
-                return true;
+                return new(true, result);
             }
             catch (Exception ex) {
-                return this.ExitError(ex.Message);
+                return new(false, ex.Message);
             }
         }
     }
@@ -321,12 +316,12 @@ namespace GalaxyToolkit.Commands {
               Type: The value type. (Supported: s8, u8, s16, u16, s32, u32, s64, u64, f32, f64)
             """;
 
-        public bool Execute(Toolkit toolkit, string[] args) {
+        public CommandResult Execute(Toolkit toolkit, string[] args) {
             if (args.Length < 4)
                 return this.ExitError();
 
             if (!uint.TryParse(Utils.RemoveHexSpecifier(args[2]), System.Globalization.NumberStyles.HexNumber, null, out var address))
-                return this.ExitError($"Unable to parse address \"{args[2]}\".");
+                return new(false, $"Unable to parse address \"{args[2]}\".");
 
             try {
                 var data = new Address(toolkit.Dolphin, address);
@@ -345,10 +340,10 @@ namespace GalaxyToolkit.Commands {
                     default: throw new Exception($"Unknown data type \"{args[1]}\".");
                 };
 
-                return true;
+                return CommandResult.SilentSucess;
             }
             catch (Exception ex) {
-                return this.ExitError(ex.Message);
+                return new(false, ex.Message);
             }
         }
     }

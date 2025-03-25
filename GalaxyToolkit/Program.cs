@@ -1,5 +1,7 @@
 ﻿using DolphinMemory;
+using GalaxyToolkit.Structures;
 using GalaxyToolkit.Symbols;
+using GalaxyToolkit.UI;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -12,6 +14,14 @@ namespace GalaxyToolkit {
                 Console.WriteLine("GalaxyToolkit is only supported on Windows. Linux support will be added later.");
                 Environment.Exit(0);
             }
+
+            StructureManager.RegisterAllStructures();
+
+            return;
+
+            var mainWindow = new MainWindow();
+            mainWindow.Run();
+            return;
 
             while (true) {
                 Console.WriteLine("""

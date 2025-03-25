@@ -10,7 +10,7 @@ namespace GToolkitCore {
         u32 mToolMessage; // _0
         u32 mGameMessage; // _4
         char mData[64];   // _8
-    
+
         static MessageData sInstance;
     };
 

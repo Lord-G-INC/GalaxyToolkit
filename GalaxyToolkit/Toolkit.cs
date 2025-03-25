@@ -56,7 +56,7 @@ namespace GalaxyToolkit {
             var dataAddress = new Address(_dolphin, ToolAccessAddress).Read<uint>();
 
             if (dataAddress == 0)
-                throw new ToolkitException("Data address is invalid. Did you install the module?");
+                throw new ToolkitException("Data address is invalid. Wait for the Wiimote strap screen to end.");
 
             _toolMessage = new(_dolphin, dataAddress);
             _gameMessage = new(_dolphin, dataAddress + 4);
@@ -66,7 +66,7 @@ namespace GalaxyToolkit {
             Utils.WriteLineColor($"Toolkit initialized, data located at 0x{dataAddress:X8}.", ConsoleColor.Blue);
         }
 
-        public bool ExecuteCommand(string input) {
+        public CommandResult ExecuteCommand(string input) {
             return CommandManager.ExecuteCommand(this, input);
         }
 

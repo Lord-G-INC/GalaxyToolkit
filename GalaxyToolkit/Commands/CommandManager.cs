@@ -12,11 +12,10 @@ namespace GalaxyToolkit.Commands {
         }
 
         static CommandManager() {
-            _commands = new(8);
+            _commands = new(7);
 
             RegisterCommand(new CrashCommand());
             RegisterCommand(new FreezeCommand());
-            RegisterCommand(new HelpCommand());
             RegisterCommand(new LogCommand());
             // RegisterCommand(new ObjectCommand());
             RegisterCommand(new StageCommand());
@@ -29,36 +28,26 @@ namespace GalaxyToolkit.Commands {
             _commands.Add(command.Keyword, command);
         }
 
-        public static bool ExecuteCommand(Toolkit tookit, string input) {
+        public static CommandResult ExecuteCommand(Toolkit tookit, string input) {
             var parts = input.Split(' ');
 
             if (parts.Length == 0)
-                return false;
+                return new(false, "Command is empty.");
 
             if (Commands.TryGetValue(parts[0], out var command)) {
-                bool result;
-
                 try {
-                    result = command.Execute(tookit, parts);
+                    return command.Execute(tookit, parts);
                 }
                 catch (Exception ex) {
-                    result = false;
-                    Console.WriteLine(ex.ToString());
+                    return new(false, $"Exception while executing command \"{parts[0]}\": {ex.Message}");
                 }
-
-                if (!result)
-                    Utils.WriteLineColor($"Error while executing command \"{parts[0]}\".", ConsoleColor.Red);
-
-                return result;
             }
 
-            Utils.WriteLineColor($"Command \"{parts[0]}\" not found.", ConsoleColor.Red);
-            return false;
+            return new(false, $"Command \"{parts[0]}\" not found.");
         }
 
-        public static bool ExitError(this IToolkitCommand command, string? message = null) {
-            Console.WriteLine(message ?? command.HelpMessage);
-            return false;
+        public static CommandResult ExitError(this IToolkitCommand command) {
+            return new(false, command.HelpMessage);
         }
     }
 }

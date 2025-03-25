@@ -1,0 +1,9 @@
+{
+    "Name": "NameObj",
+    "Members": [
+        { "Name": "mName", "Type": "string", "Offset": 4 },
+        { "Name": "mFlags", "Type": "u16", "Offset": 8 },
+        { "Name": "mExecuteIdx", "Type": "s16", "Offset": 10 },
+        { "Name": "mLinkedInfo", "Type": "mLinkedInfo", "Offset": 12 }
+    ]
+}
