@@ -66,7 +66,7 @@ namespace GalaxyToolkit {
         }
 
         static bool TryConnectDolphin([NotNullWhen(true)] out Dolphin? dolphin) {
-            var processes = Process.GetProcessesByName("dolphin");
+            var processes = Process.GetProcessesByName(OperatingSystem.IsWindows() ? "dolphin" : "dolphin-emu");
             var idx = 0;
 
             if (processes.Length == 0) {
