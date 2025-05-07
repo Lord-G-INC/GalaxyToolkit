@@ -1,22 +1,21 @@
-﻿using DolphinMemory.Native;
-using Reloaded.Memory;
-using Reloaded.Memory.Interfaces;
+﻿using Reloaded.Memory;
 using System;
 using System.Diagnostics;
+
+#pragma warning disable CA1416
 
 namespace DolphinMemory {
     public class Dolphin : IDisposable {
         private const long EmulatedMemorySize = 0x2000000;
         private const long EmulatedMemoryBase = 0x80000000;
 
-        private nint _emulatedMemoryPointer;
         private readonly nint _baseAddress;
         private readonly int _moduleSize;
 
-        private readonly ICanReadWriteMemory _memory;
+        private readonly ExternalMemory _memory;
         private readonly Process _process;
 
-        public ICanReadWriteMemory Memory {
+        public ExternalMemory Memory {
             get => _memory;
         }
 
@@ -34,10 +33,7 @@ namespace DolphinMemory {
             _baseAddress = module.BaseAddress;
             _moduleSize = module.ModuleMemorySize;
 
-            if (_process.Id == Environment.ProcessId)
-                _memory = new Memory();
-            else
-                _memory = new ExternalMemory(_process);
+            _memory = new ExternalMemory(_process);
         }
 
         public nuint GetAddress(long address) {
@@ -48,34 +44,8 @@ namespace DolphinMemory {
         }
 
         public unsafe bool TryGetBaseAddress(out nint emulatedBaseAddress) {
-            if (_emulatedMemoryPointer != nint.Zero) {
-                _memory.Read((nuint)_emulatedMemoryPointer.ToInt64(), out emulatedBaseAddress);
-                return emulatedBaseAddress != nint.Zero;
-            }
-
             if (TryGetDolphinPage(out emulatedBaseAddress)) {
-                var dolphinMainModule = new byte[_moduleSize];
-
-                _memory.ReadRaw((nuint)_baseAddress.ToInt64(), dolphinMainModule);
-                long readCount = _moduleSize - sizeof(nint);
-
-                fixed (byte* mainModulePtr = dolphinMainModule) {
-                    var lastAddress = (long)mainModulePtr + readCount;
-                    var currentAddress = (long)mainModulePtr;
-
-                    while (currentAddress < lastAddress) {
-                        var current = *(nint*)currentAddress;
-
-                        if (current == emulatedBaseAddress) {
-                            var offset = currentAddress - (long)mainModulePtr;
-                            _emulatedMemoryPointer = (nint)(_baseAddress + offset);
-                            return true;
-                        }
-
-                        currentAddress += 1;
-                    }
-                }
-
+                Console.WriteLine($"{_baseAddress:X16} {emulatedBaseAddress:X16}");
                 return true;
             }
 
@@ -99,16 +69,18 @@ namespace DolphinMemory {
             return false;
         }
 
-        private unsafe bool IsDolphinPage(WinNative.BasicMemoryInformation memoryPage) {
-            if (memoryPage.RegionSize == (nint)EmulatedMemorySize && memoryPage.lType == WinNative.PageType.Mapped) {
-                var setInformation = new WinNative.PSApiWorkingSetExInfo[1];
-                setInformation[0].VirtualAddress = memoryPage.BaseAddress;
+        private unsafe bool IsDolphinPage(MemoryInformation memory) {
+            if (memory.RegionSize == (nint)EmulatedMemorySize && memory.Type == WinNative.PageType.Mapped) {
+                if (OperatingSystem.IsWindows()) {
+                    var setInformation = new WinNative.PSApiWorkingSetExInfo[1];
+                    setInformation[0].VirtualAddress = memory.BaseAddress;
 
-                if (!WinNative.QueryWorkingSetEx(_process.Handle, setInformation, sizeof(WinNative.PSApiWorkingSetExInfo) * setInformation.Length))
-                    return false;
+                    if (!WinNative.QueryWorkingSetEx(_process.Handle, setInformation, sizeof(WinNative.PSApiWorkingSetExInfo) * setInformation.Length))
+                        return false;
 
-                if (setInformation[0].VirtualAttributes.Valid)
-                    return true;
+                    return setInformation[0].VirtualAttributes.Valid;
+                }
+                else return true;
             }
 
             return false;

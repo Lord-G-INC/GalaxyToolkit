@@ -1,4 +1,5 @@
 #include "Core.h"
+#include "Game/Camera/CameraDirector.h"
 
 u8 handle;
 u32 param;
@@ -28,8 +29,6 @@ namespace GToolkitCore {
 
                 s8 scenarioNo = (MessageData::sInstance.mToolMessage >> 8) & 0xFF;
                 s8 starNo = (MessageData::sInstance.mToolMessage >> 16) & 0xFF;
-
-                OSReport("[GToolkit] %d %d\n", scenarioNo, starNo);
 
                 MR::stopStageBGM(60);
                 MR::closeSystemWipeCircleWithCaptureScreen(60);
@@ -80,16 +79,14 @@ namespace GToolkitCore {
         MessageData::sInstance.mToolMessage = 0;
     }
 
-    void handleException() {
-        __asm {
-            lwz     r28, 8(r3) // Original instruction at the hook address
-            lis     r6, 0x8000
-            ori     r6, r6, 0x2FF4
-            lwz     r6, 0(r6)
-            addi    r6, r6, 0x4
-            stw     r28, 0(r6)
-            blr
-        }
+    void asm handleException() {
+        lwz     r28, 8(r3) // Original instruction at the hook address
+        lis     r6, 0x8000
+        ori     r6, r6, 0x2FF4
+        lwz     r6, 0(r6)
+        addi    r6, r6, 0x4
+        stw     r28, 0(r6)
+        blr
     }
 
     void parseCommand() {

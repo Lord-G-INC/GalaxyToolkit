@@ -5,6 +5,11 @@ Game/riivolution/config/
 */dbg/
 */obj/
 
+Modules/
+!Modules/GalaxyToolkit/
+!Modules/Syati_Init/
+!Modules/Syati_ObjectFactories/
+!Modules/.moduleignore/
 Modules/*/build/
 Modules/*/codebuild/
 
