@@ -1,6 +1,8 @@
 #include "Core.h"
 #include "Game/Camera/CameraDirector.h"
 
+#pragma warning off (10211) 
+
 u8 handle;
 u32 param;
 
