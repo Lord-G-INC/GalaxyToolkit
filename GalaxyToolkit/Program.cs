@@ -8,11 +8,6 @@ using System.IO;
 namespace GalaxyToolkit {
     internal class Program {
         static void Main(string[] args) {
-            if (!OperatingSystem.IsWindows()) {
-                Console.WriteLine("GalaxyToolkit is only supported on Windows. Linux support will be added later.");
-                Environment.Exit(0);
-            }
-
             while (true) {
                 Console.WriteLine("""
                     ------------ GalaxyToolkit ------------
