@@ -44,9 +44,9 @@ namespace DolphinMemory {
                 _iterationCount++;
             }
             else {
-                using var reader = new StreamReader($"proc/{_process.Id}/maps");
+                using var reader = new StreamReader($"/proc/{_process.Id}/maps");
 
-                for (int i = 0; i < ++_iterationCount; i++)
+                for (int i = 0; i < _iterationCount; i++)
                     reader.ReadLine();
 
                 var line = reader.ReadLine();
@@ -65,6 +65,8 @@ namespace DolphinMemory {
                     RegionSize = regionSize,
                     Type = WinNative.PageType.Mapped
                 };
+
+                _iterationCount++;
             }
 
             _currentAddress += (ulong)_current.RegionSize;

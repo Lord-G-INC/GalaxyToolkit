@@ -9,11 +9,9 @@ namespace DolphinMemory {
         private const long EmulatedMemorySize = 0x2000000;
         private const long EmulatedMemoryBase = 0x80000000;
 
-        private readonly nint _baseAddress;
-        private readonly int _moduleSize;
-
         private readonly ExternalMemory _memory;
         private readonly Process _process;
+        private readonly nint _baseAddress;
 
         public ExternalMemory Memory {
             get => _memory;
@@ -31,8 +29,6 @@ namespace DolphinMemory {
                 throw new Exception("Process address information could not be read.");
 
             _baseAddress = module.BaseAddress;
-            _moduleSize = module.ModuleMemorySize;
-
             _memory = new ExternalMemory(_process);
         }
 
@@ -45,7 +41,6 @@ namespace DolphinMemory {
 
         public unsafe bool TryGetBaseAddress(out nint emulatedBaseAddress) {
             if (TryGetDolphinPage(out emulatedBaseAddress)) {
-                Console.WriteLine($"{_baseAddress:X16} {emulatedBaseAddress:X16}");
                 return true;
             }
 

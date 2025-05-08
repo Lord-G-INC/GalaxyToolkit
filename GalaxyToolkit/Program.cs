@@ -1,5 +1,6 @@
 ﻿using DolphinMemory;
 using GalaxyToolkit.Symbols;
+using Reloaded.Memory;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;

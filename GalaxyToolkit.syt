@@ -1,4 +1,10 @@
 {
+  "Modules": [
+    "ExtCometScreenFilter",
+    "GalaxyToolkit",
+    "Syati_CommonFunctionHooks",
+    "Syati_Init"
+  ],
   "ModulesPath": "Modules\\",
   "OutputPath": "Game\\GToolkit\\CustomCode\\",
   "Regions": [
